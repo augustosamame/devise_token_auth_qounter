@@ -7,7 +7,6 @@ module DeviseTokenAuth
       if is_json_api
         response_data['type'] = @resource.class.name.parameterize
       end
-      response_data['assets'] = Asset.where(user_id: @resource.id).as_json
       response_data
     end
 
