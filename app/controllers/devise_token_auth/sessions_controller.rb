@@ -125,6 +125,12 @@ module DeviseTokenAuth
       }, status: 401
     end
 
+    def render_create_error_does_not_exist
+      render json: {
+        errors: ["No user exists with this phone number. Please register again."]
+      }, status: 401
+    end
+
     def render_destroy_success
       render json: {
         success:true
