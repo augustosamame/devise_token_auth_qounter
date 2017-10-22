@@ -6,7 +6,11 @@ module DeviseTokenAuth
     skip_after_action :update_auth_header, :only => [:create, :destroy]
 
     def create
+
+      return render_create_partner_ext_id_already_exists if @partner_ext_id_exists_error_flag
+      return render_create_partner_ext_id_not_sent if @partner_ext_id_not_sent_error_flag
       @resource            = resource_class.new(sign_up_params)
+      @resource.partner_ext_user_id = nil unless @partner
       @resource.provider   = "mobile"
 
       # honor devise configuration for case_insensitive_keys
@@ -143,6 +147,22 @@ module DeviseTokenAuth
         status: 'error',
         data:   resource_data,
         errors: [I18n.t("devise_token_auth.registrations.email_already_exists", email: @resource.email)]
+      }, status: 422
+    end
+
+    def render_create_partner_ext_id_already_exists
+      render json: {
+        status: 'error',
+        data:   resource_data,
+        errors: ["Partner External user id already exists"]
+      }, status: 422
+    end
+
+    def render_create_partner_ext_id_not_sent
+      render json: {
+        status: 'error',
+        data:   resource_data,
+        errors: ["partner_ext_user_id parameter is required"]
       }, status: 422
     end
 
