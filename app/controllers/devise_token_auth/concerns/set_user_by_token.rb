@@ -42,12 +42,12 @@ module DeviseTokenAuth::Concerns::SetUserByToken
       if devise_warden_user && devise_warden_user.tokens[@client_id].nil?
         @used_auth_by_token = false
         @resource = devise_warden_user
-        @resource.update(last_activity_at: Time.now) if @resource.has_attribute?(:last_activity_at)
         @resource.create_new_auth_token
       end
     end
 
     # user has already been found and authenticated
+    @resource.update(last_activity_at: Time.now) if @resource && @resource.has_attribute?(:last_activity_at)
     return @resource if @resource and @resource.class == rc
 
     # ensure we clear the client_id
@@ -68,6 +68,7 @@ module DeviseTokenAuth::Concerns::SetUserByToken
       else
         sign_in(:user, user, store: false, bypass: true)
       end
+      user.update(last_activity_at: Time.now) if user && user.has_attribute?(:last_activity_at)
       return @resource = user
     else
       # zero all values previously set values
