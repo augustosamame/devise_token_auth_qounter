@@ -42,6 +42,7 @@ module DeviseTokenAuth::Concerns::SetUserByToken
       if devise_warden_user && devise_warden_user.tokens[@client_id].nil?
         @used_auth_by_token = false
         @resource = devise_warden_user
+        @resource.update(last_activity_at: Time.now) if @resource.has_attribute?(:last_activity_at)
         @resource.create_new_auth_token
       end
     end
